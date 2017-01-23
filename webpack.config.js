@@ -24,9 +24,14 @@ module.exports = {
 	module: {
 		rules: [
 			{
+				include: [path.join(__dirname, 'node_modules', 'pixi.js')],
+				use: [
+					{loader: 'ify-loader'},
+				],
+			},
+			{
 				test: /\.jsx?$/,
 				include: [path.join(__dirname, 'scripts')],
-				// loader: 'babel-loader',
 				use: [
 					{
 						loader: 'babel-loader',
@@ -36,22 +41,6 @@ module.exports = {
 							plugins: [],
 						},
 					},
-				],
-			},
-			{
-				// test: ,
-				include: [path.join(__dirname, 'node_modules', 'pixi.js')],
-				enforce: 'post',
-				// loader: 'ify-loader',
-				use: [
-					{loader: 'ify-loader'},
-				],
-			},
-			{
-				test: /\.json$/,
-				include: [path.join(__dirname, 'scripts')],
-				use: [
-					{loader: 'json-loader'},
 				],
 			},
 		],

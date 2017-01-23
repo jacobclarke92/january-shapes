@@ -1,5 +1,4 @@
-// import PIXI, { Container, Graphics } from '../node_modules/pixi.js/dist/pixi.js'
-const { Container, Graphics } = PIXI;
+import { autoDetectRenderer, Container, Graphics } from 'pixi.js'
 import $ from 'jquery'
 import palettes from './palettes'
 import { 
