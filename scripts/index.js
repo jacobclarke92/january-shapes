@@ -52,7 +52,7 @@ function init() {
 	for(let n=0; n < rows; n ++) {
 
 		const startPos = {x: -20, y: -paddingY + rowHeight*n};
-		const angleRange = 20 + randomInt(-20, 20);
+		const angleRange = randomInt(-20, 20);
 		let theta = Math.random()*Math.PI;
 
 		for(let i=0; i<cols; i ++) {
