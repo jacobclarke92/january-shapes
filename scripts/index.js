@@ -1,12 +1,19 @@
 import { autoDetectRenderer, Container, Graphics } from 'pixi.js'
 import $ from 'jquery'
-import palettes from './palettes'
+import palettes from './constants/palettes'
 import { 
 	addResizeCallback, 
 	getPixelDensity, 
 	getScreenWidth, 
 	getScreenHeight 
 } from './utils/screenUtils'
+import {
+	radToDeg,
+	degToRad,
+	randomInt,
+	randomFloat,
+	getRandomValueFromArray,
+} from './utils/mathUtils'
 
 // Init PIXI renderer
 const $app = $('#app');
@@ -25,13 +32,6 @@ $app.append(canvas);
 
 
 const stageWrapper = new Container();
-
-const radToDeg = rad => rad*180/Math.PI;
-const degToRad = deg => deg/180*Math.PI;
-const randomFloat = (min, max) => min + Math.random()*(max-min);
-const randomInt = (min, max) => min + Math.round(Math.random()*(max-min));
-const getRandomValueFromArray = array => array[Math.floor(Math.random()*array.length)];
-
 const groups = [];
 
 function init() {
