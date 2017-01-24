@@ -27,7 +27,7 @@ $app.append(canvas);
 
 const stageWrapper = new Container();
 const stage = new Container();
-const stageScale = 0.1;
+const stageScale = 0.25 / getPixelDensity();
 stageWrapper.addChild(stage);
 
 const sprites = {};
