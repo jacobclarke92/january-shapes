@@ -1,18 +1,12 @@
 var path = require('path');
 var webpack = require('webpack');
-
-var babelLoaderSettings = JSON.stringify({
-	cacheDirectory: true,
-	presets: ['es2015', 'stage-0', 'react'],
-	plugins: ['transform-decorators-legacy', 'glslify'],
-});
+var BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 module.exports = {
 	devtool: '#sourcemap',
 	entry: {
-		scripts: [
-			'./scripts/index.js'
-		],
+		scripts: ['./scripts/index.js'],
+		bigsound: ['./scripts/bigsound.js'],
 	},
 	output: {
 		path: path.join(__dirname, 'webroot', 'dist'),
@@ -20,6 +14,11 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.NoEmitOnErrorsPlugin(),
+		new BrowserSyncPlugin({
+			host: 'localhost',
+			port: 3000,
+			server: { baseDir: ['webroot'] }
+		}),
 	],
 	module: {
 		rules: [
