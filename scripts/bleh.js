@@ -38,12 +38,13 @@ stageWrapper.addChild(stage);
 let shapes = [];
 let palette = [];
 let angle = 0;
+const easeSpeed = 30;
 
 
 function init() {
 
 	
-	shapes = [];
+	// shapes = [];
 	
 	palette = getRandomValueFromArray(palettes);
 	const backgroundColor = getRandomValueFromArray(palette);
@@ -55,18 +56,42 @@ function init() {
 	animate();
 }
 
+function reinit() {
+	init();
+	shapes.forEach(shape => createShape(shape));
+}
+
 const getRandomPosition = () => ({
 	x: randomInt(0, getScreenWidth()*1.2), 
 	y: randomInt(0, getScreenWidth()*1.2)
 });
 
-function createShape() {
-	const shape = new Graphics();
-	shape.position = shape.realPosition = shape.aimPosition = getRandomPosition();
+const innerDist = getScreenWidth()*0.25;
+const outerDist = getScreenWidth()*0.4;
+const getStartingPosition = () => {
+	const centerPoint = {x: getScreenWidth()/2, y: getScreenHeight()/2};
+	let position = getRandomPosition();
+	let distance = getDist(centerPoint, position);
+	while(distance > innerDist && distance < outerDist) {
+		position = getRandomPosition();
+		distance = getDist(centerPoint, position);
+	}
+	return position;
+}
+
+function createShape(shape = null) {
+	const startingPosition = getStartingPosition();
+	if(!shape) {
+		shape = new Graphics();
+		shape.position = shape.realPosition = shape.aimPosition = startingPosition;
+	}else{
+		shape.aimPosition = startingPosition;
+	}
+	
 	shape.pivot.set(0.5);
 	shape.rotation = angle + randomFloat(-0.1, 0.1);
 	const width = randomInt(4, 30);
-	const height = randomInt(10, 300);
+	const height = randomInt(10, 50);
 	shape.lineStyle(1, getRandomValueFromArray(palette), 1);
 	shape.beginFill(getRandomValueFromArray(palette));
 	shape.drift = {x: randomFloat(0,5), y: randomFloat(0,5)};
@@ -79,16 +104,19 @@ function createShape() {
 	}
 	shape.endFill();
 	shape.cacheAsBitmap = true;
-	shape.interactive = true;
-	shape.on('mouseover', () => {
-		shape.aimPosition = getRandomPosition();
-	});
+
+	// this causes a lot of processing
+	// shape.interactive = true;
+	// shape.on('mouseover', () => {
+	// 	shape.aimPosition = getRandomPosition();
+	// });
+	
 	return shape;
 }
 
 function animate() {
 
-	if(shapes.length < 1500) {
+	if(shapes.length < 3000) {
 		for(let i=0; i<25; i++) {
 			const shape = createShape();
 			shapes.push(shape);
@@ -99,8 +127,8 @@ function animate() {
 
 	for(let shape of shapes) {
 		shape.theta += shape.thetaSpeed;
-		shape.realPosition.x += (shape.aimPosition.x - shape.realPosition.x) / 10;
-		shape.realPosition.y += (shape.aimPosition.y - shape.realPosition.y) / 10;
+		shape.realPosition.x += (shape.aimPosition.x - shape.realPosition.x) / easeSpeed;
+		shape.realPosition.y += (shape.aimPosition.y - shape.realPosition.y) / easeSpeed;
 		shape.position.x = shape.realPosition.x + Math.cos(shape.theta)*shape.drift.x;
 		shape.position.y = shape.realPosition.y + Math.sin(shape.theta)*shape.drift.y;
 	}
@@ -120,3 +148,4 @@ function handleResize(width, height) {
 
 addResizeCallback(handleResize);
 $(window).ready(init);
+$(window).on('click', reinit);
