@@ -88,8 +88,9 @@ gui.add(vars, 'RandomizeColor');
 gui.add(vars, 'Reset');
 
 
-console.log(gui);
 
+
+let initedColorPick = false;
 function init() {
 
 	branchCount = 0;
@@ -101,15 +102,21 @@ function init() {
 	flowers = [];
 	outermostBranches = [];
 
+	if(!initedColorPick) {
+		pickColors();
+		initedColorPick = true;
+	}
 
+	animate();
+}
+
+function pickColors() {
 	palette = getRandomValueFromArray(palettes);
 	const backgroundColor = getRandomValueFromArray(palette);
 	renderer.backgroundColor = backgroundColor;
 	palette = palette.filter(val => val != backgroundColor);
 	branchColor = getRandomValueFromArray(palette);
 	palette = palette.filter(val => val != branchColor);
-
-	animate();
 }
 
 function reinit() {
@@ -177,13 +184,7 @@ function createFlower(parent) {
 }
 
 function recolor() {
-	palette = getRandomValueFromArray(palettes);
-	const backgroundColor = getRandomValueFromArray(palette);
-	renderer.backgroundColor = backgroundColor;
-	palette = palette.filter(val => val != backgroundColor);
-	branchColor = getRandomValueFromArray(palette);
-	palette = palette.filter(val => val != branchColor);
-
+	pickColors();
 	branches.forEach(branch => {
 		branch.graphics.cacheAsBitmap = false;
 		branch.graphics.clear();
@@ -226,9 +227,9 @@ function animate() {
 	if(branchCount == 0) {
 
 		stage.currentRotation = 0;
-		outermostBranches = [
-			createBranch(stage, {x: getScreenWidth()/2, y: getScreenHeight()*0.92})
-		];
+		const branch = createBranch(stage, {x: getScreenWidth()/2, y: getScreenHeight()*0.92});
+		outermostBranches = [branch];
+		branches = [branch];
 
 	}else if(branchCount < vars.maxBranches) {
 
