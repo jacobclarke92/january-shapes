@@ -8,7 +8,7 @@ module.exports = {
 		scripts: ['./scripts/index.js'],
 		bigsound: ['./scripts/bigsound.js'],
 		bleh: ['./scripts/bleh.js'],
-		take2: ['./scripts/take2.js'],
+		tree: ['./scripts/tree.js'],
 	},
 	output: {
 		path: path.join(__dirname, 'webroot', 'dist'),
