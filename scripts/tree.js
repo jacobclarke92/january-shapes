@@ -2,6 +2,7 @@ import { autoDetectRenderer, Container, Graphics } from 'pixi.js'
 import $ from 'jquery'
 import dat from 'dat.gui/build/dat.gui'
 import palettes from './constants/palettes'
+import treePresets, { defaultVars } from './constants/treePresets'
 import { 
 	addResizeCallback, 
 	getPixelDensity, 
@@ -43,29 +44,10 @@ let flowers = [];
 let outermostBranches = [];
 let branchColor = 0x000000;
 
-const vars = {
-	initBranchWidth: 30,
-	initBranchHeight: 30,
-	minBranchWidth: 4,
-	minBranchHeight: 5,
-	branchTaper: 0.8,
-	branchTrim: 0.6,
-	branchLean: 0.2,
-	branchOverlap: 0.65,
-
-	minSplitAngle: 0.1,
-	maxSplitAngle: 0.5,
-
-	maxBranches: 4200,
-	splitProbability: 0.14,
-	pruneProbability: 0.05,
-	// maxBranchesBeforeSplit: 20,
-	splitToLifeRatio: 0.1,
-
-	windSpeed: 0.005,
-	initWindForce: 0.003,
-};
-
+const vars = Object.assign({}, defaultVars, {
+	Reset: () => reinit(),
+	RandomizeColor: () => recolor(),
+});
 
 let windForce = vars.initWindForce;
 let windDelta = 0;
@@ -76,8 +58,8 @@ let addedCherries = false;
 let branchWidth = vars.initBranchWidth;
 let branchHeight = vars.initBranchHeight;
 
-
-const gui = new dat.GUI();
+console.log(treePresets);
+const gui = new dat.GUI({load: treePresets});
 gui.remember(vars);
 
 const guiBranchSize = gui.addFolder('Branch Size');
@@ -93,6 +75,7 @@ const guiBranchLogic = gui.addFolder('Branch Logic');
 guiBranchLogic.add(vars, 'maxBranches', 100, 10000);
 guiBranchLogic.add(vars, 'minSplitAngle', 0.05, Math.PI/2);
 guiBranchLogic.add(vars, 'maxSplitAngle', 0.05, Math.PI/2);
+guiBranchLogic.add(vars, 'branchLean', 0.001, Math.PI/2);
 guiBranchLogic.add(vars, 'splitProbability', 0, 1);
 guiBranchLogic.add(vars, 'pruneProbability', 0, 1);
 guiBranchLogic.add(vars, 'splitToLifeRatio', 0, 1);
@@ -101,6 +84,8 @@ const guiWind = gui.addFolder('Wind');
 guiWind.add(vars, 'windSpeed', 0.001, 0.6);
 guiWind.add(vars, 'initWindForce', 0.001, 0.6);
 
+gui.add(vars, 'RandomizeColor');
+gui.add(vars, 'Reset');
 
 
 console.log(gui);
@@ -156,12 +141,9 @@ function createBranch(parent, position, startAngle = 0) {
 	branch.currentRotation = parent.currentRotation + branch.rotation;
 	branch.position = position;
 
-	// graphics.lineStyle(1, 0x000000, 1);
-	graphics.beginFill(branchColor);
-	graphics.drawRect(-branchWidth/2, -branchHeight, branchWidth, branchHeight);
-	graphics.endFill();
-	graphics.cacheAsBitmap = true;
+	drawBranch(graphics, branchColor, branchWidth, branchHeight);
 
+	branch.branchWidth = branchWidth;
 	branch.branchHeight = branchHeight;
 	branch.timesSplit = parent.timesSplit || 0;
 	branch.family = (parent.family || 0) + 1;
@@ -173,6 +155,14 @@ function createBranch(parent, position, startAngle = 0) {
 
 }
 
+function drawBranch(graphics, color, width, height) {
+	// graphics.lineStyle(1, 0x000000, 1);
+	graphics.beginFill(color);
+	graphics.drawRect(-width/2, -height, width, height);
+	graphics.endFill();
+	graphics.cacheAsBitmap = true;
+}
+
 function createFlower(parent) {
 	const radius = randomFloat(4, 20) * ((parent.branchHeight / vars.initBranchHeight)/0.35);
 	const flower = new Graphics();
@@ -181,8 +171,32 @@ function createFlower(parent) {
 	flower.drawCircle(0,0, radius);
 	flower.endFill();
 	flower.cacheAsBitmap = true;
+	flower.radius = radius;
 	parent.flower = flower;
 	parent.addChild(flower);
+}
+
+function recolor() {
+	palette = getRandomValueFromArray(palettes);
+	const backgroundColor = getRandomValueFromArray(palette);
+	renderer.backgroundColor = backgroundColor;
+	palette = palette.filter(val => val != backgroundColor);
+	branchColor = getRandomValueFromArray(palette);
+	palette = palette.filter(val => val != branchColor);
+
+	branches.forEach(branch => {
+		branch.graphics.cacheAsBitmap = false;
+		branch.graphics.clear();
+		drawBranch(branch.graphics, branchColor, branch.branchWidth, branch.branchHeight);
+		if(branch.flower) {
+			branch.flower.cacheAsBitmap = false;
+			branch.flower.clear();
+			branch.flower.beginFill(getRandomValueFromArray(palette));
+			branch.flower.drawCircle(0,0, branch.flower.radius);
+			branch.flower.endFill();
+			branch.flower.cacheAsBitmap = true;
+		}
+	});
 }
 
 
