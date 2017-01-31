@@ -80,10 +80,11 @@ guiBranchLogic.add(vars, 'branchLean', 0.001, Math.PI/2);
 guiBranchLogic.add(vars, 'splitProbability', 0, 1);
 guiBranchLogic.add(vars, 'pruneProbability', 0, 1);
 guiBranchLogic.add(vars, 'splitToLifeRatio', 0, 1);
+guiBranchLogic.add(vars, 'maxSegments', 10, 10000);
 
 const guiWind = gui.addFolder('Wind');
 guiWind.add(vars, 'windSpeed', 0.001, 0.6);
-guiWind.add(vars, 'initWindForce', 0.001, 0.6).onChange(value => windForce = value);
+guiWind.add(vars, 'initWindForce', 0, 0.6001).onChange(value => windForce = value);
 
 gui.add(vars, 'RandomizeColor');
 gui.add(vars, 'Reset');
@@ -123,18 +124,16 @@ function pickColors() {
 function reinit() {
 	flowers.forEach(flower => {
 		stage.removeChild(flower);
-		flower.cacheAsBitmap = false;
 		flower.destroy(true);
 	});
 	branches.forEach(branch => {
 		if(branch.parent) branch.parent.removeChild(branch);
-		branch.graphics.cacheAsBitmap = false;
 		branch.destroy(true);
 	});
-	stageWrapper.removeChild(stage);
-	stage.destroy();
-	stage = new Container();
-	stageWrapper.addChild(stage);
+	// stageWrapper.removeChild(stage);
+	// stage.destroy();
+	// stage = new Container();
+	// stageWrapper.addChild(stage);
 	init();
 }
 
@@ -237,7 +236,7 @@ function animate() {
 		const newOutermostBranches = [];
 		outermostBranches.forEach(branch => {
 			const splitsOverLife = branch.timesSplit/branch.family;
-			if(branch.timesSplit > 3 && branchWidth < vars.initBranchWidth/3 && Math.random() < vars.pruneProbability) {
+			if(branch.family >= vars.maxSegments || (branch.timesSplit > 3 && branchWidth < vars.initBranchWidth/3 && Math.random() < vars.pruneProbability)) {
 				createFlower(branch);
 			}else{
 				if(Math.random() < vars.splitProbability || splitsOverLife <= vars.splitToLifeRatio) {

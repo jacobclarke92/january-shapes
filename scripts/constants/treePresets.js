@@ -15,6 +15,7 @@ export const defaultVars = {
 	splitProbability: 0.14,
 	pruneProbability: 0.05,
 	splitToLifeRatio: 0.1,
+	maxSegments: 500,
 
 	windSpeed: 0.005,
 	initWindForce: 0.003,
@@ -46,6 +47,19 @@ export default {
 			branchLean: 0,
 			splitProbability: 0.12,
 			initWindForce: 0.00001,
+		})},
+		Wirey: {0: Object.assign({}, defaultVars, {
+			maxBranches: 2000,
+			minBranchWidth: 3,
+			initBranchHeight: 25,
+			branchTaper: 0.35,
+
+			maxSegments: 180,
+			maxSplitAngle: 0.2,
+			splitProbability: 0.035,
+			splitToLifeRatio: 0.001,
+			initWindForce: 0,
+			windSpeed: 0,
 		})}
 	}
 }
