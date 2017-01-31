@@ -37,6 +37,7 @@ $app.append(canvas);
 const stageWrapper = new Container();
 let stage = new Container();
 stageWrapper.addChild(stage);
+stageWrapper.scale.set(1 / getPixelDensity());
 
 let palette = [];
 let branches = [];
@@ -82,7 +83,7 @@ guiBranchLogic.add(vars, 'splitToLifeRatio', 0, 1);
 
 const guiWind = gui.addFolder('Wind');
 guiWind.add(vars, 'windSpeed', 0.001, 0.6);
-guiWind.add(vars, 'initWindForce', 0.001, 0.6);
+guiWind.add(vars, 'initWindForce', 0.001, 0.6).onChange(value => windForce = value);
 
 gui.add(vars, 'RandomizeColor');
 gui.add(vars, 'Reset');
@@ -207,7 +208,7 @@ function shedFlowers() {
 		if(branch.flower) {
 			const flower = branch.flower;
 			const flowerGlobalPos = flower.worldTransform;
-			const flowerPosition = {x: flowerGlobalPos.tx, y: flowerGlobalPos.ty};
+			const flowerPosition = {x: flowerGlobalPos.tx * getPixelDensity(), y: flowerGlobalPos.ty * getPixelDensity()};
 			branch.removeChild(flower);
 			stage.addChild(flower);
 			flower.position = flower.realPosition = flowerPosition;
